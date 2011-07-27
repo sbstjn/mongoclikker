@@ -1,5 +1,4 @@
 var app = require('express').createServer();
-var Mongolian = require('mongolian');
 var Mu = require('./vendor/Mu');
 var Db = require('mongodb').Db,
     Connection = require('mongodb').Connection,
