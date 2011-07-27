@@ -4,11 +4,13 @@
 
     [sudo] node mongoclikker.js
 
-![mongoclikker](http://img.hazelco.de/mongoclikker-20110727-211717.jpg)
+Open [http://localhost:2002/view/DATABASE](http://localhost:2002/view/DATABASE) in your web borwser and your good to go…
+
+![mongoclikker](http://img.hazelco.de/mongoclikker-20110727-211919.jpg)
 
 ## dependencies
 
-mongoclikker uses [mustache](http://mustache.github.com/) for rendering some HTML code. mustache will be replaced in the future, it was used for testing purposes…
+mongoclikker uses [mustache](http://mustache.github.com/) for rendering some HTML code. mustache will be replaced in the future, it has been used for testing purposes :)
 
     git submodule init
     git submodule update
@@ -17,7 +19,7 @@ mongoclikker uses [mustache](http://mustache.github.com/) for rendering some HTM
 
 ## configure
 
-See `mongoclikker.js` for setting a default database and mongodb connection. Defaults should be fine, but enable **public access to your database**! Use mongoclikker wisely…
+See `mongoclikker.js` for setting a default database and mongodb connection. Default settings should work fine for getting connected to your mongodb server, but they enable **public web access to your databases** while mongoklikker is running!
 
     var defaultDatabase = 'mongoclikker';
     var defaultHostname = 'localhost';
