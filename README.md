@@ -19,7 +19,7 @@ mongoclikker uses [mustache](http://mustache.github.com/) for rendering some HTM
 
 ## configure
 
-See `mongoclikker.js` for setting a default database and mongodb connection. Default settings should work fine for getting connected to your mongodb server, but they enable **public web access to your databases** while mongoklikker is running!
+See `mongoclikker.js` for setting a default database and mongodb connection. Default settings should work fine for getting connected to your mongodb server, but they enable **public web access to your databases** while mongoclikker is running!
 
     var defaultDatabase = 'mongoclikker';
     var defaultHostname = 'localhost';
