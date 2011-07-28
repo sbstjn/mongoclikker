@@ -51,7 +51,6 @@ function endResponse(res) {
 
 var funcStartMongoclikker = function() {
   var app = require('express').createServer();
-  var Mu = require('./vendor/Mu');
   var Db = require('mongodb').Db,
       Connection = require('mongodb').Connection,
       Server = require('mongodb').Server,
@@ -88,91 +87,82 @@ var funcStartMongoclikker = function() {
   
     var db = new Db(dbName, new Server(currentHostname, currentPort, {}), connectionSettings);
     var path = viewURL;
-    var dbItems = new Array();
-    for (var i = 0; i < listDB.length; i++) {
-      var tmp = {name: listDB[i]};
-      if (req.params.curDB == listDB[i]) { tmp.isCurrent = true; }
-      dbItems.push(tmp);
-    }
     
-    var compiled = Mu.compileText('<table><tr><td class="desc">database</td><td class="content"><ul id="db">' + 
-                                  '{{#items}}<li><a href="' + path + '{{name}}" {{#isCurrent}} class="current"{{/isCurrent}}>{{name}}</a></li>{{/items}}' + 
-                                  '</ul></td></tr>', {});
-    compiled({items: dbItems}).addListener('data', function (dbSelection) { res.write(dbSelection); }).addListener('end', function() {
-      if (!req.params.curDB) {
-        endResponse(res);
-      } else {
-        /* Has DB selected */
-        path += req.params.curDB + '/';
-        db.open(function(err, ignored) {
-          if (err) console.log(err);
-          db.collectionNames(function(err, names) {
-            var colItems = new Array();
-            for (var i = 0; i < names.length; i++) {
-              /* Parse collection list */
-              var tmp = {name: names[i].name.replace(req.params.curDB + '.', '')};
-              if (req.params.curCollection == tmp.name) { tmp.isCurrent = true; }              
-              if (tmp.name.indexOf('.indexes') == -1) { colItems.push(tmp); }
+    res.write('<table><tr><td class="desc">database</td><td class="content"><ul id="db">');
+    for (var i = 0; i < listDB.length; i++) { res.write('<li><a href="' + path + listDB[i] + '">' + listDB + '</a></li>') }
+    res.write('</ul></td></tr>');
+
+    if (!req.params.curDB) {
+      endResponse(res);
+    } else {
+      /* Has DB selected */
+      path += req.params.curDB + '/';
+      db.open(function(err, ignored) {
+        if (err) console.log(err);
+        db.collectionNames(function(err, names) {
+          var colItems = new Array();
+          res.write('<tr><td class="desc">collection</td><td class="content"><ul id="collection">');
+          for (var i = 0; i < names.length; i++) {
+            /* Parse collection list */
+            var tmp = names[i].name.replace(req.params.curDB + '.', '');
+            if (tmp.indexOf('.indexes') == -1) { 
+              res.write('<li><a href="' + path + tmp + '/0/20">' + tmp + '</a></li>');
             }
-            
-            var compiled = Mu.compileText('<tr><td class="desc">collection</td><td class="content"><ul id="collection">' + 
-                                          '{{#items}}<li><a href="' + path + '{{name}}/0/20"{{#isCurrent}} class="current"{{/isCurrent}}>{{name}}</a></li>{{/items}}' + '</ul></td></tr>', {});
-            compiled({items: colItems, path: path}).addListener('data', function (colSelection) { res.write(colSelection); }).addListener('end', function() {
-              if (!req.params.curCollection) {
-                endResponse(res);
-              } else {
-                /* Has Collection selected */
-                path += req.params.curCollection + '/' + req.params.curStart + '/' + req.params.curLimit + '/';
-                var db = new Db(dbName, new Server(currentHostname, currentPort, {}), connectionSettings);
-                db.open(function(err, db) {
-                  db.collection(req.params.curCollection, function(err, collection) {
-                    collection.find({}, {'skip':req.params.curStart, 'limit':req.params.curLimit}).toArray(function(err, results) {
-                      var docItems = new Array();
-                      for (var i = 0; i < results.length; i++) {
-                        if (results[i]) {
-                          docItems.push(results[i]);
-                        }
-                      }
-                      
-                      var prevStart = (req.params.curStart*1 - 1*req.params.curLimit);
-                      if (prevStart < 0) { prevStart = 0;  }
-                      if (req.params.curDocument) { selectedItem = '/' + req.params.curDocument; }
-                      
-                      var selectedItem  = '';
-                      var baseURL       = viewURL + req.params.curDB + '/' + req.params.curCollection + '/';                      
-                      var nextURL       = baseURL + (req.params.curStart*1 + 1*req.params.curLimit) + '/' + req.params.curLimit + selectedItem;
-                      var prevURL       = baseURL + prevStart + '/' + req.params.curLimit + selectedItem;
-                      
-                      var compiled = Mu.compileText('<tr><td class="desc">item</td><td class="content"><ul id="documents">' + 
-                                                    '{{#items}}<li><a href="' + path + '{{_id}}"{{#isCurrent}} class="current"{{/isCurrent}}>{{_id}}</a></li>{{/items}}' + 
-                                                    '</ul></td></tr><tr class="docsNav"><td class="desc"></td><td class="content"><a href="' + prevURL + '">prev</a> | <a href="' + nextURL + '">next</a></td></tr>', {});
-                      compiled({items: docItems, path: path}).addListener('data', function (docSelection) { res.write(docSelection); }).addListener('end', function () { 
-                        if (!req.params.curDocument) {
+          }
+          
+          if (!req.params.curCollection) {
+            endResponse(res);
+          } else {
+            /* Has Collection selected */
+            path += req.params.curCollection + '/' + req.params.curStart + '/' + req.params.curLimit + '/';
+            var db = new Db(dbName, new Server(currentHostname, currentPort, {}), connectionSettings);
+            db.open(function(err, db) {
+              db.collection(req.params.curCollection, function(err, collection) {
+                collection.find({}, {'skip':req.params.curStart, 'limit':req.params.curLimit}).toArray(function(err, results) {
+                  var docItems = new Array();
+                  res.write('<tr><td class="desc">item</td><td class="content"><ul id="documents">');
+                  for (var i = 0; i < results.length; i++) {
+                    if (results[i]) {
+                      res.write('<li><a href="' + path + results[i]._id + '">' + results[i]._id + '</a></li>');
+                      docItems.push(results[i]);
+                    }
+                  }
+                  res.write('</ul></td></tr>');;
+                  var prevStart = (req.params.curStart*1 - 1*req.params.curLimit);
+                  if (prevStart < 0) { prevStart = 0;  }
+                  if (req.params.curDocument) { selectedItem = '/' + req.params.curDocument; }
+                  
+                  var selectedItem  = '';
+                  var baseURL       = viewURL + req.params.curDB + '/' + req.params.curCollection + '/';                      
+                  var nextURL       = baseURL + (req.params.curStart*1 + 1*req.params.curLimit) + '/' + req.params.curLimit + selectedItem;
+                  var prevURL       = baseURL + prevStart + '/' + req.params.curLimit + selectedItem;
+                  res.write('<tr class="docsNav"><td class="desc"></td><td class="content">');
+                  res.write('<a href="' + prevURL + '">prev</a> | <a href="' + nextURL + '">next</a></td></tr>');
+                  
+                  if (!req.params.curDocument) {
+                    res.write('</table>');
+                    endResponse(res); 
+                  } else {
+                    /* Selected Document */
+                    var db = new Db(dbName, new Server(currentHostname, currentPort, {}), connectionSettings);
+                    db.open(function(err, db) {
+                      db.collection(req.params.curCollection, function(err, collection2) {
+                        collection.find({'_id': new BSON.ObjectID(req.params.curDocument)}).toArray(function(err, results) {
+                          for (var n in results[0]) { res.write('<tr><td class="desc key">' + n + '</td><td class="content value">' + results[0][n] + '</td></tr>'); }
                           res.write('</table>');
                           endResponse(res); 
-                        } else {
-                          /* Selected Document */
-                          var db = new Db(dbName, new Server(currentHostname, currentPort, {}), connectionSettings);
-                          db.open(function(err, db) {
-                            db.collection(req.params.curCollection, function(err, collection2) {
-                              collection.find({'_id': new BSON.ObjectID(req.params.curDocument)}).toArray(function(err, results) {
-                                for (var n in results[0]) { res.write('<tr><td class="desc key">' + n + '</td><td class="content value">' + results[0][n] + '</td></tr>'); }
-                                res.write('</table>');
-                                endResponse(res); 
-                              });
-                            });
-                          });
-                        }
+                        });
                       });
                     });
-                  });
+                  }
                 });
-              }
+              });
             });
-          });
+          }
+          
         });
-      }
-    });
+      });
+    }
   });
     
   app.listen(mongoclickkerConnection.web);
