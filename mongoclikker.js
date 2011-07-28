@@ -6,6 +6,14 @@ var Db = require('mongodb').Db,
     BSON = require('mongodb').BSONNative;
 var viewURL = '/view/';
 
+if (BSON == null) {
+  // no native support, fall back to pure mode
+  var BSON = require('mongodb').BSONPure;
+  var connectionSettings = {};
+} else {
+  var connectionSettings = {native_parser:true};
+}
+
 var defaultDatabase = 'mongoclikker';
 var defaultHostname = 'localhost';
 var defaultPort     = '27017';
@@ -30,7 +38,7 @@ app.get(viewURL + ':curDB?/:curCollection?/:curStart?/:curLimit?/:curDocument?',
   var dbName = req.params.curDB || defaultDatabase;
   var listDB = [dbName];
 
-  var db = new Db(dbName, new Server(defaultHostname, defaultPort, {}), {native_parser:true});
+  var db = new Db(dbName, new Server(defaultHostname, defaultPort, {}), connectionSettings);
   var path = viewURL;
   var dbItems = new Array();
   for (var i = 0; i < listDB.length; i++) {
@@ -67,7 +75,7 @@ app.get(viewURL + ':curDB?/:curCollection?/:curStart?/:curLimit?/:curDocument?',
             } else {
               /* Has Collection selected */
               path += req.params.curCollection + '/' + req.params.curStart + '/' + req.params.curLimit + '/';
-              var db = new Db(dbName, new Server(defaultHostname, defaultPort, {}), {native_parser:true});
+              var db = new Db(dbName, new Server(defaultHostname, defaultPort, {}), connectionSettings);
               db.open(function(err, db) {
                 db.collection(req.params.curCollection, function(err, collection) {
                   collection.find({}, {'skip':req.params.curStart, 'limit':req.params.curLimit}).toArray(function(err, results) {
@@ -96,7 +104,7 @@ app.get(viewURL + ':curDB?/:curCollection?/:curStart?/:curLimit?/:curDocument?',
                         endResponse(res); 
                       } else {
                         /* Selected Document */
-                        var db = new Db(dbName, new Server(defaultHostname, defaultPort, {}), {native_parser:true});
+                        var db = new Db(dbName, new Server(defaultHostname, defaultPort, {}), connectionSettings);
                         db.open(function(err, db) {
                           db.collection(req.params.curCollection, function(err, collection2) {
                             collection.find({'_id': new BSON.ObjectID(req.params.curDocument)}).toArray(function(err, results) {
