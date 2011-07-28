@@ -6,7 +6,7 @@
 
 Open [http://localhost:2002/view/DATABASE](http://localhost:2002/view/DATABASE) in your web borwser and your good to go…
 
-![mongoclikker](http://img.hazelco.de/mongoclikker-20110727-211919.jpg)
+![mongoclikker](http://img.hazelco.de/mongoclikker-20110728-192528.jpg)
 
 ## dependencies
 
@@ -24,5 +24,3 @@ See `mongoclikker.js` for setting a default database and mongodb connection. Def
     var defaultDatabase = 'mongoclikker';
     var defaultHostname = 'localhost';
     var defaultPort     = '27017';
-
-
