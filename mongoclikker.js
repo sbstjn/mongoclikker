@@ -118,7 +118,7 @@ var funcStartMongoclikker = function() {
                 collection.find({}, {'skip':req.params.curStart, 'limit':req.params.curLimit}).toArray(function(err, results) {
                   res.write('<tr><td class="desc">item</td><td class="content"><ul id="documents">');
                   for (var i = 0; i < results.length; i++) { 
-                    if (results[i]) { res.write('<li><a href="' + path + results[i]._id + '">' + results[i]._id + '</a></li>'); } }
+                    if (results[i]) { res.write('<li><a href="' + path + results[i]._id + '">' + (results[i].name && typeof(results[i].name) == 'string' ? results[i].name + ' (#' + results[i]._id + ')' : results[i]._id) + '</a></li>'); } }
                   res.write('</ul></td></tr>');;
                   var prevStart = (req.params.curStart*1 - 1*req.params.curLimit);
                   if (prevStart < 0) { 
