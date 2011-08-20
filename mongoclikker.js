@@ -12,37 +12,37 @@ var funcSetHost = function(host) {
   mongoclickkerConnection.host = host;
 
   return this;
-}
+};
 
 var funcAndPort = function(port) {
   mongoclickkerConnection.port = port;
 
   return this;
-}
+};
 
 var funcWithUser = function(user) {
   mongoclickkerConnection.user = user;
   
   return this;
-}
+};
 
 var funcAndPassword = function(password) {
   mongoclickkerConnection.pass = password
   
   return this;
-}
+};
 
 var funcforDatabase = function(database) {
   mongoclickkerConnection.db = database;
 
   return this;
-}
+};
 
 var funcAndListenOn = function(port) {
   mongoclickkerConnection.web = port;
   
   funcStartMongoclikker();
-}
+};
 
 function endResponse(res) {
   res.write('</html>');
@@ -58,7 +58,7 @@ var funcStartMongoclikker = function() {
       connectionSettings = {native_parser:true};
   var viewURL = '/view/';
   
-  if (BSON == null) {
+  if (BSON === null) {
     // no native support, fall back to pure mode
     BSON = require('mongodb').BSONPure;
     connectionSettings = {};
@@ -87,7 +87,7 @@ var funcStartMongoclikker = function() {
     var path = viewURL;
     
     res.write('<table><tr><td class="desc">database</td><td class="content"><ul id="db">');
-    for (var i = 0; i < listDB.length; i++) { res.write('<li><a href="' + path + listDB[i] + '">' + listDB + '</a></li>') }
+    for (var i = 0; i < listDB.length; i++) { res.write('<li><a href="' + path + listDB[i] + '">' + listDB + '</a></li>'); }
     res.write('</ul></td></tr>');
 
     if (!req.params.curDB) {
@@ -99,7 +99,7 @@ var funcStartMongoclikker = function() {
         if (err) {
           console.log(err); }
         db.collectionNames(function(err, names) {
-          var colItems = new Array();
+          var colItems = [];
           res.write('<tr><td class="desc">collection</td><td class="content"><ul id="collection">');
           for (var i = 0; i < names.length; i++) {
             var tmp = names[i].name.replace(req.params.curDB + '.', '');
@@ -119,7 +119,7 @@ var funcStartMongoclikker = function() {
                   res.write('<tr><td class="desc">item</td><td class="content"><ul id="documents">');
                   for (var i = 0; i < results.length; i++) { 
                     if (results[i]) { res.write('<li><a href="' + path + results[i]._id + '">' + (results[i].name && typeof(results[i].name) == 'string' ? results[i].name + ' (#' + results[i]._id + ')' : results[i]._id) + '</a></li>'); } }
-                  res.write('</ul></td></tr>');;
+                  res.write('</ul></td></tr>');
                   var prevStart = (req.params.curStart*1 - 1*req.params.curLimit);
                   if (prevStart < 0) { 
                     prevStart = 0;  }
@@ -167,7 +167,7 @@ var funcStartMongoclikker = function() {
     
   app.listen(mongoclickkerConnection.web);
   console.log('Listening on http://localhost:' + mongoclickkerConnection.web + ':' + viewURL);
-}
+};
 
 exports.setHost = funcSetHost;
 exports.andPort = funcAndPort;
