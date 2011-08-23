@@ -7,7 +7,6 @@ var mongoclickkerConnection = {
 , web     : '2002'
 };
 
-
 var funcSetHost = function(host) {
   mongoclickkerConnection.host = host;
 
