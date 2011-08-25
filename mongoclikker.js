@@ -57,7 +57,7 @@ var funcStartMongoclikker = function() {
       connectionSettings = {native_parser:true};
   var viewURL = '/view/';
   
-  if (BSON === null) {
+  if (BSON == null) {
     // no native support, fall back to pure mode
     BSON = require('mongodb').BSONPure;
     connectionSettings = {};
