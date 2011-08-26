@@ -75,7 +75,7 @@ var funcStartMongoclikker = function() {
     res.redirect(viewURL);
   });
   
-  app.get(viewURL + ':curDB?/:curCollection?/:curStart?/:curLimit?/:curDocument?', function(req, res, next) {
+  app.get(viewURL + ':curDB?/:curCollection?/:curStart?/:curLimit?/:curDocument?/:curKey?/:subID?', function(req, res, next) {
     res.write('<html><head><title>mongoclikker</title><link rel="stylesheet" href="/style.css"></head>');
   
     // don't know how to get `show dbs` with node yet, so start with one datebase
@@ -148,7 +148,34 @@ var funcStartMongoclikker = function() {
                           params = {'_id': new  BSON.ObjectID(req.params.curDocument)}; }
                         collection.find(params).toArray(function(err, results) {
                           for (var n in results[0]) { 
-                            res.write('<tr><td class="desc key">' + n + '</td><td class="content value">' + results[0][n] + '</td></tr>'); }
+                            if (results[0][n] instanceof Array) {
+                              res.write('<tr><td class="desc key">' + n + '</td><td class="content value"><ul>');
+                              for (var s in results[0][n]) {
+                                if (results[0][n][s]._id) {
+                                  if (results[0][n][s].name) {
+                                    res.write('<li><a href="' + path + req.params.curDocument + '/' + n + '/' + results[0][n][s]._id + '">');
+                                    res.write(results[0][n][s].name + ' (#' + results[0][n][s]._id + ')</a>'); }
+                                  else {                                  
+                                    if (results[0][n][s]._id) {
+                                      res.write('<li><a href="' + path + req.params.curDocument + '/' + n + '/' + results[0][n][s]._id + '">');
+                                      res.write(results[0][n][s]._id + '</a>'); 
+                                    }
+                                  }
+                                  
+                                  if (req.params.subID && results[0][n][s]._id == req.params.subID) {
+                                    res.write('<ul>');
+                                    res.write('<li>key: value</li>');
+                                    res.write('</ul>');
+                                  }
+                                  
+                                  res.write('</li>');
+                                }
+                              }
+                              res.write('</ul></td></tr>');
+                            } else {
+                              res.write('<tr><td class="desc key">' + n + '</td><td class="content value">' + results[0][n] + '</td></tr>'); 
+                            }
+                          }
                           res.write('</table>');
                           endResponse(res); 
                         });
@@ -163,7 +190,7 @@ var funcStartMongoclikker = function() {
       });
     }
   });
-    
+
   app.listen(mongoclickkerConnection.web);
   console.log('Listening on http://localhost:' + mongoclickkerConnection.web + ':' + viewURL);
 };
