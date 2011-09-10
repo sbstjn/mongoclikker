@@ -49,13 +49,13 @@ function endResponse(res) {
 }
 
 var funcStartMongoclikker = function() {
-  var app = require('express').createServer();
-  var Db = require('mongodb').Db,
-      Connection = require('mongodb').Connection,
-      Server = require('mongodb').Server,
-      BSON = require('mongodb').BSONNative,
-      connectionSettings = {native_parser:true};
-  var viewURL = '/view/';
+  var app = require('express').createServer()
+    , Db = require('mongodb').Db
+    , Connection = require('mongodb').Connection
+    , Server = require('mongodb').Server
+    , BSON = require('mongodb').BSONNative
+    , connectionSettings = {native_parser:true}
+    , viewURL = '/view/';
   
   if (BSON == null) {
     // no native support, fall back to pure mode
@@ -63,9 +63,9 @@ var funcStartMongoclikker = function() {
     connectionSettings = {};
   }
   
-  var currentDatabase = mongoclickkerConnection.db;
-  var currentHostname = mongoclickkerConnection.host;
-  var currentPort     = mongoclickkerConnection.port;
+  var currentDatabase = mongoclickkerConnection.db
+    , currentHostname = mongoclickkerConnection.host
+    , currentPort     = mongoclickkerConnection.port;
   
   app.get('/style.css', function(req, res) {
     res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } a { text-decoration: none; color: #bf1010; } a:hover { text-decoration: underline; } .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } .content { font-size: 14px; font-weight: normal; padding-left: 25px; } .content ul { list-style-type: none; margin: 0; padding: 0; } .content ul li { margin: 0; padding: 0; } .docsNav { font-size: 14px; font-weight: normal; } .docsNav td { padding-top: 15px; padding-bottom: 25px; } .key { color: #999; } tr:hover .key { color: #36393D; }");
@@ -76,14 +76,13 @@ var funcStartMongoclikker = function() {
   });
   
   app.get(viewURL + ':curDB?/:curCollection?/:curStart?/:curLimit?/:curDocument?/:curKey?/:subID?', function(req, res, next) {
-    res.write('<html><head><title>mongoclikker</title><link rel="stylesheet" href="/style.css"></head>');
+    res.write('<html><head><title>mongoclikker</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><link rel="stylesheet" href="/style.css"></head>');
   
     // don't know how to get `show dbs` with node yet, so start with one datebase
-    var dbName = req.params.curDB || currentDatabase;
-    var listDB = [dbName];
-  
-    var db = new Db(dbName, new Server(currentHostname, currentPort, {}), connectionSettings);
-    var path = viewURL;
+    var dbName = req.params.curDB || currentDatabase
+      , listDB = [dbName]
+      , db = new Db(dbName, new Server(currentHostname, currentPort, {}), connectionSettings)
+      , path = viewURL;
     
     res.write('<table><tr><td class="desc">database</td><td class="content"><ul id="db">');
     for (var i = 0; i < listDB.length; i++) { res.write('<li><a href="' + path + listDB[i] + '">' + listDB + '</a></li>'); }
@@ -125,15 +124,16 @@ var funcStartMongoclikker = function() {
                   if (req.params.curDocument) { 
                     selectedItem = '/' + req.params.curDocument; }
                   
-                  var selectedItem  = '';
-                  var baseURL       = viewURL + req.params.curDB + '/' + req.params.curCollection + '/';                      
-                  var nextURL       = baseURL + (req.params.curStart*1 + 1*req.params.curLimit) + '/' + req.params.curLimit + selectedItem;
-                  var prevURL       = baseURL + prevStart + '/' + req.params.curLimit + selectedItem;
+                  var selectedItem = ''
+                    , baseURL = viewURL + req.params.curDB + '/' + req.params.curCollection + '/'
+                    , nextURL = baseURL + (req.params.curStart*1 + 1*req.params.curLimit) + '/' + req.params.curLimit + selectedItem
+                    , prevURL = baseURL + prevStart + '/' + req.params.curLimit + selectedItem;
                   res.write('<tr class="docsNav"><td class="desc"></td><td class="content">');
                   
                   if (req.params.curStart > 0) { 
                     res.write('<a href="' + prevURL + '">prev</a> | '); }
-                  res.write('<a href="' + nextURL + '">next</a></td></tr>');
+                  if (results.length >= req.params.curLimit) {
+                    res.write('<a href="' + nextURL + '">next</a></td></tr>'); }  
                   
                   if (!req.params.curDocument) {
                     res.write('</table>');
@@ -151,27 +151,24 @@ var funcStartMongoclikker = function() {
                             if (results[0][n] instanceof Array) {
                               res.write('<tr><td class="desc key">' + n + '</td><td class="content value"><ul>');
                               for (var s in results[0][n]) {
-                                if (results[0][n][s]._id) {
-                                  if (results[0][n][s].name) {
-                                    res.write('<li><a href="' + path + req.params.curDocument + '/' + n + '/' + results[0][n][s]._id + '">');
-                                    res.write(results[0][n][s].name + ' (#' + results[0][n][s]._id + ')</a>'); }
-                                  else {                                  
-                                    if (results[0][n][s]._id) {
-                                      res.write('<li><a href="' + path + req.params.curDocument + '/' + n + '/' + results[0][n][s]._id + '">');
-                                      res.write(results[0][n][s]._id + '</a>'); 
-                                    }
+                                var current0NSItem = results[0][n][s];
+                                if (current0NSItem._id) {
+                                  if (current0NSItem.name) {
+                                    res.write('<li><a href="' + path + req.params.curDocument + '/' + n + '/' + current0NSItem._id + '">');
+                                    res.write(current0NSItem.name + ' (#' + current0NSItem._id + ')</a>'); }
+                                  else if (current0NSItem._id) {
+                                    res.write('<li><a href="' + path + req.params.curDocument + '/' + n + '/' + current0NSItem._id + '">');
+                                    res.write(current0NSItem._id + '</a>'); 
                                   }
-                                  
-                                  if (req.params.subID && results[0][n][s]._id == req.params.subID) {
-                                    var curSubItem = results[0][n][s];
+                                 
+                                  if (req.params.subID && current0NSItem._id == req.params.subID) {
                                     res.write('<table>');
-                                    for (var key in curSubItem) {
+                                    for (var key in current0NSItem) {
                                       res.write('<tr><td class="desc key">' + key + '</td><td class="content value">');
-                                      res.write(curSubItem[key] + '</td></tr>');
+                                      res.write(current0NSItem[key] + '</td></tr>');
                                     }
                                     res.write('</table>');
                                   }
-                                  
                                   res.write('</li>');
                                 }
                               }
@@ -194,7 +191,6 @@ var funcStartMongoclikker = function() {
       });
     }
   });
-
   app.listen(mongoclickkerConnection.web);
   console.log('Listening on http://localhost:' + mongoclickkerConnection.web + ':' + viewURL);
 };
