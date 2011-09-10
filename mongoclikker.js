@@ -163,9 +163,13 @@ var funcStartMongoclikker = function() {
                                   }
                                   
                                   if (req.params.subID && results[0][n][s]._id == req.params.subID) {
-                                    res.write('<ul>');
-                                    res.write('<li>key: value</li>');
-                                    res.write('</ul>');
+                                    var curSubItem = results[0][n][s];
+                                    res.write('<table>');
+                                    for (var key in curSubItem) {
+                                      res.write('<tr><td class="desc key">' + key + '</td><td class="content value">');
+                                      res.write(curSubItem[key] + '</td></tr>');
+                                    }
+                                    res.write('</table>');
                                   }
                                   
                                   res.write('</li>');
