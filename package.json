@@ -1,17 +1,33 @@
-{ "name" : "mongoclikker"
-, "description" : "MongoDB viewer"
-, "keywords" : [ "mongodb", "dbviwer", "viewer", "db" ]
-, "version" : "0.2.0"
-, "homepage" : "https://github.com/semu/mongoclikker"
-, "repository" :
-  { "type" : "git"
-  , "url" : "https://github.com/semu/mongoclikker.git"
-  }
-, "dependencies" :
-  { "mongodb" : ">= 0.9.6-7", "express": ">= 2.2.2" }  
-, "licenses" :
-  [ { "type" : "MIT"
-    , "url" : "http://github.com/semu/mongoclikker/raw/master/LICENSE"
+{
+  "name": "mongoclikker",
+  "description": "MongoDB database viewer",
+  "keywords": [
+    "mongodb",
+    "dbviewer",
+    "viewer",
+    "db",
+    "database",
+    "mongo"
+  ],
+  "version": "0.2.1",
+  "author": "Sebastian Müller <code@semu.mp> (http://semu.mp)",
+  "homepage": "https://github.com/semu/mongoclikker",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/semu/mongoclikker.git"
+  },
+  "dependencies": {
+    "mongodb": ">= 0.9.6-7",
+    "express": ">= 2.2.2"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/semu/mongoclikker/raw/master/LICENSE"
     }
-  ]
-}  
+  ],
+  "devDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
