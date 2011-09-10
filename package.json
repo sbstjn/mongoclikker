@@ -1,0 +1,17 @@
+{ "name" : "mongoclikker"
+, "description" : "MongoDB viewer"
+, "keywords" : [ "mongodb", "dbviwer", "viewer", "db" ]
+, "version" : "0.2.0"
+, "homepage" : "https://github.com/semu/mongoclikker"
+, "repository" :
+  { "type" : "git"
+  , "url" : "https://github.com/semu/mongoclikker.git"
+  }
+, "dependencies" :
+  { "mongodb" : ">= 0.9.6-7", "express": ">= 2.2.2" }  
+, "licenses" :
+  [ { "type" : "MIT"
+    , "url" : "http://github.com/semu/mongoclikker/raw/master/LICENSE"
+    }
+  ]
+}  
