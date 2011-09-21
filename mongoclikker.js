@@ -68,7 +68,19 @@ var funcStartMongoclikker = function() {
     , currentPort     = mongoclickkerConnection.port;
   
   app.get('/style.css', function(req, res) {
-    res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } a { text-decoration: none; color: #bf1010; } a:hover { text-decoration: underline; } .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } .content { font-size: 14px; font-weight: normal; padding-left: 25px; } .content ul { list-style-type: none; margin: 0; padding: 0; } .content ul li { margin: 0; padding: 0; } .docsNav { font-size: 14px; font-weight: normal; } .docsNav td { padding-top: 15px; padding-bottom: 25px; } .key { color: #999; } tr:hover .key { color: #36393D; }");
+    res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); .canEdit { cursor: pointer; } .canEdit input { font-family: 'Varela Round', sans-serif; font-size: 14px; font-weight: normal; padding: 0 0 0 2px; margin: 0px; border: 0px; background-color: #CCC; } body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } a { text-decoration: none; color: #bf1010; } a:hover { text-decoration: underline; } .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } .content { font-size: 14px; font-weight: normal; padding-left: 25px; } .content ul { list-style-type: none; margin: 0; padding: 0; } .content ul li { margin: 0; padding: 0; } .docsNav { font-size: 14px; font-weight: normal; } .docsNav td { padding-top: 15px; padding-bottom: 25px; } .key { color: #999; } tr:hover .key { color: #36393D; }");
+  });
+  
+  app.get('/script.js', function(req, res) {
+    var fs = require('fs');
+    fs.readFile(__dirname + '/script.js', function(error, content) {
+      if (error) {
+        res.writeHead(500);
+        res.end(); }
+      else {
+        res.writeHead(200, { 'Content-Type': 'text/javascript' });
+        res.end(content, 'utf-8'); }
+    });
   });
   
   app.get('/', function(req, res) {
@@ -76,7 +88,7 @@ var funcStartMongoclikker = function() {
   });
   
   app.get(viewURL + ':curDB?/:curCollection?/:curStart?/:curLimit?/:curDocument?/:curKey?/:subID?', function(req, res, next) {
-    res.write('<html><head><title>mongoclikker</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><link rel="stylesheet" href="/style.css"></head>');
+    res.write('<html><head><title>mongoclikker</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script><script src="/script.js"></script><link rel="stylesheet" href="/style.css"></head>');
   
     // don't know how to get `show dbs` with node yet, so start with one datebase
     var dbName = req.params.curDB || currentDatabase
@@ -164,7 +176,7 @@ var funcStartMongoclikker = function() {
                                   if (req.params.subID && current0NSItem._id == req.params.subID) {
                                     res.write('<table>');
                                     for (var key in current0NSItem) {
-                                      res.write('<tr><td class="desc key">' + key + '</td><td class="content value">');
+                                      res.write('<tr><td class="desc key">' + key + '</td><td class="content value subValue canEdit"  id="' + req.params.curDocument + '_' + n + '_' + current0NSItem._id + '_' + key + '">');
                                       res.write(current0NSItem[key] + '</td></tr>');
                                     }
                                     res.write('</table>');
@@ -174,7 +186,7 @@ var funcStartMongoclikker = function() {
                               }
                               res.write('</ul></td></tr>');
                             } else {
-                              res.write('<tr><td class="desc key">' + n + '</td><td class="content value">' + results[0][n] + '</td></tr>'); 
+                              res.write('<tr><td class="desc key">' + n + '</td><td class="content value propValue canEdit" id="' + req.params.curDocument + '_' + n + '">' + results[0][n] + '</td></tr>'); 
                             }
                           }
                           res.write('</table>');
