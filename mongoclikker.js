@@ -66,6 +66,82 @@ function endResponse(res) {
   res.end();
 }
 
+function typeOf(o){
+  var type = typeof o;
+         //If typeof return something different than object then returns it.
+	if (type !== 'object') {
+		return type;
+         //If it is an instance of the Array then return "array"
+	} else if (Object.prototype.toString.call(o) === '[object Array]') {
+		return 'array';
+         //If it is null then return "null"
+	} else if (o === null) {
+		return 'null';
+       //if it gets here then it is an "object"
+	} else {
+    if (o instanceof Date) {
+      return 'date';
+    }
+    
+		return 'object';
+	}
+}
+
+function isID(data) {
+  return (data.length == 12 || data.length == 24);
+}
+
+function canEditValue(value) {
+  var curType = typeOf(value);
+  return !(curType == 'array' || curType == 'object');
+}
+
+var displayValue = function(data, path, index, params) {
+  var curType     = typeOf(data);
+  var curValue    = data;
+  var curDisplay  = '';
+  
+  if (curType == 'array') {
+    var curLength = curValue.length;
+    curDisplay = '<table>';
+    for (var i = 0; i < curLength; i++) {
+      curDisplay += '<tr><td class="desc key">#' + i + '</td><td class="content value subValue"  id="">' + displayValue(data[i], path, i, params) + '</td></tr>';
+    }
+    curDisplay += '</table>';
+  } else if (curType == 'date') {
+    curDisplay = curValue;
+  } else if (curType == 'object') {
+    var hasHeadline = false;
+    if (curValue._id && curValue.name) {
+      hasHeadline = '<a href="' + path + curValue._id + '">' + curValue.name + ' (#' + curValue._id + ')</a><br />';
+    } else if (curValue._id) {
+      hasHeadline = '<a href="' + path + curValue._id + '">' + curValue._id + '</a><br />';
+    } else if (curValue.name) {
+      hasHeadline = '<a href="">' + curValue.name + '</a><br />';
+    }
+
+    var curDisplay = hasHeadline || '';
+    var objString = curValue.toString();
+    if (isID(objString)) {
+      curDisplay += '<a href="">' + objString + '</a>';
+    } else {
+      var styleString = 'display:none;';
+      if (!hasHeadline || hasHeadline && params.subID && params.subID == curValue._id) {
+        styleString = ''; }
+      
+      curDisplay += '<table style="' + styleString + '">';
+      for (var key in curValue) {
+        curDisplay += '<tr><td class="desc key">' + key + ':</td><td class="content value subValue"  id="">' + curValue[key] + '</td></tr>';
+      }
+      curDisplay += '</table>';
+    }
+  } else {
+    curDisplay = curValue;
+  }
+  
+  return curDisplay;
+};
+
 var funcStartMongoclikker = function() {
   var app = require('express').createServer()
     , express = require('express')
@@ -96,7 +172,7 @@ var funcStartMongoclikker = function() {
    * Serve style.css file
    * */
   app.get('/style.css', function(req, res) {
-    res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); .canEdit { cursor: pointer; } .canEdit input { font-family: 'Varela Round', sans-serif; font-size: 14px; font-weight: normal; padding: 0 0 0 2px; margin: 0px; border: 0px; background-color: #CCC; } body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } a { text-decoration: none; color: #bf1010; } a:hover { text-decoration: underline; } .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } .content { font-size: 14px; font-weight: normal; padding-left: 25px; } .content ul { list-style-type: none; margin: 0; padding: 0; } .content ul li { margin: 0; padding: 0; } .docsNav { font-size: 14px; font-weight: normal; } .docsNav td { padding-top: 15px; padding-bottom: 25px; } .key { color: #999; } tr:hover .key { color: #36393D; }");
+    res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); table { -webkit-border-horizontal-spacing: 0px; -webkit-border-vertical-spacing: 0px; border-spacing: 0px; } .canEdit { cursor: pointer; } td { padding-top: 0px } .canEdit input { font-family: 'Varela Round', sans-serif; font-size: 14px; font-weight: normal; padding: 0 0 0 2px; margin: 0px; border: 0px; background-color: #CCC; } body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } a { text-decoration: none; color: #bf1010; } a:hover { text-decoration: underline; } .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } .content { font-size: 14px; font-weight: normal; padding-left: 25px; } .content ul { list-style-type: none; margin: 0; padding: 0; } .content ul li { margin: 0; padding: 0; } .docsNav { font-size: 14px; font-weight: normal; } .docsNav td { padding-top: 15px; padding-bottom: 25px; } .key { color: #999; } tr:hover .key { color: #36393D; }");
   });
   
   /**
@@ -255,11 +331,12 @@ var funcStartMongoclikker = function() {
                     if (req.params.curDocument.length == 12 || req.params.curDocument.length == 24) { 
                       params = {'_id': new  BSON.ObjectID(req.params.curDocument)}; }
                     collection.find(params).toArray(function(err, results) {
+                      path += req.params.curDocument + '/';
                       for (var n in results[0]) { 
-                        if (results[0][n] instanceof Array) {
+                        if (true == false && results[0][n] instanceof Array) {
                           /**
                            * Document has sub documents
-                           * */
+                           * 
                           res.write('<tr><td class="desc key">' + n + '</td><td class="content value"><ul>');
                           for (var s in results[0][n]) {
                             var current0NSItem = results[0][n][s];
@@ -283,12 +360,25 @@ var funcStartMongoclikker = function() {
                               res.write('</li>');
                             }
                           }
-                          res.write('</ul></td></tr>');
+                          res.write('</ul></td></tr>'); */
                         } else {
                           /**
                            * Display simple document property
                            * */
-                          res.write('<tr><td class="desc key">' + n + '</td><td class="content value propValue canEdit" id="' + dbName + '__' + req.params.curCollection + '__' + req.params.curDocument + '__' + n + '">' + results[0][n] + '</td></tr>'); 
+                          var curValue = results[0][n];
+                          var curType = typeOf(curValue);
+                          var curID   = dbName + '__' + req.params.curCollection + '__' + req.params.curDocument + '__' + n + '__' + curType;
+                          var curCanEdit = canEditValue(curValue);
+                          var curKey = n;
+                          
+                          if (curType == 'array') {
+                            var curLength = curValue.length;
+                            curKey        = curKey + ' [' + curLength + ']';
+                          }
+                          
+                          curValue = displayValue(curValue, path + n + '/', 0, req.params);
+
+                          res.write('<tr><td class="desc key">' + curKey + '</td><td class="content value propValue ' + (curCanEdit ? 'canEdit' : '') + '" id="' + curID + '">' + curValue + '</td></tr>'); 
                         }
                       }
                       res.write('</table>');

@@ -2,7 +2,9 @@ function hasClicked(newThis) {
   var curThis = newThis;
   if (!$(curThis).hasClass('isActive')) {
     $(curThis).unbind();
-    $(curThis).html($('<input type="text" value="' + $(curThis).text() + '" class="curInput" /> <span class="saveOptions">[<a href="#" class="save">save</a>] [<a href="#" class="cancel" oldvalue="' + $(curThis).text() + '">cancel</a>]</span>'));
+    var tmpText = $(curThis).text();
+    $(curThis).html($('<input type="text" value="" class="curInput" /> <span class="saveOptions">[<a href="#" class="save">save</a>] [<a href="#" class="cancel" oldvalue="' + $(curThis).text() + '">cancel</a>]</span>'));
+    $(curThis).find('input').val(tmpText);
     $(curThis).addClass('isActive');
     $(curThis).find('input').focus();
   }
