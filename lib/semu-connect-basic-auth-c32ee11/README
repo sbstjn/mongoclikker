@@ -1,0 +1,26 @@
+             connect-basic-auth ~ basic auth middleware for Connect
+
+USAGE
+
+    var connect   = require("connect"),
+        basicAuth = require("basicAuth");
+
+    connect.createServer(
+      basicAuth(function (user, password) {
+        return user === "admin" && password == "secret";
+      }),
+
+      function (req, res) {
+        res.writeHead(200);
+        res.end("welcome " + req.headers.remote_user);
+      }
+    );
+
+TEST
+
+    ./bin/expresso -I lib
+
+COPYING
+
+    Copyright (c) 2010 by Simon Rozet <http://atonie.org>
+    See the COPYING file for the license (it's MIT)

@@ -7,6 +7,23 @@ function hasClicked(newThis) {
     $(curThis).find('input').focus();
   }
   
+  $(curThis).find('.save').bind('click', (function(e) {
+    var newValue = $(curThis).parent().find('input').attr('value');
+    $(curThis).html(newValue);
+    $(curThis).removeClass('isActive');
+    
+    $.post("http://hazelno.de:2002/update/" + $(curThis).attr('id'), { data: newValue},
+      function(data) {
+        
+      }
+    );
+    
+    e.stopImmediatePropagation();
+    $(curThis).click(function(e2) {
+      hasClicked(this, e2);
+    });
+  }));
+  
   $(curThis).find('.cancel').bind('click', (function(e) {
     $(curThis).html($(this).attr('oldvalue'));
     $(curThis).removeClass('isActive');

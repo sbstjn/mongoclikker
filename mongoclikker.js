@@ -1,49 +1,64 @@
 /**
  * Default mongoclikker connection settings
  * */
-var mongoclickkerConnection = {
+var mongoclikkerConnection = {
   host    : 'localhost'
 , port    : '27017'
 , user    : ''
 , pass    : ''
 , db      : 'mongoclikker'
 , web     : '2002'
+, auth    : {
+    user  : ''
+  , pass  : ''
+  }
 };
 
 var funcSetHost = function(host) {
-  mongoclickkerConnection.host = host;
+  mongoclikkerConnection.host = host;
 
   return this;
 };
 
 var funcAndPort = function(port) {
-  mongoclickkerConnection.port = port;
+  mongoclikkerConnection.port = port;
 
   return this;
 };
 
 var funcWithUser = function(user) {
-  mongoclickkerConnection.user = user;
+  mongoclikkerConnection.user = user;
   
   return this;
 };
 
 var funcAndPassword = function(password) {
-  mongoclickkerConnection.pass = password
+  mongoclikkerConnection.pass = password
   
   return this;
 };
 
 var funcforDatabase = function(database) {
-  mongoclickkerConnection.db = database;
+  mongoclikkerConnection.db = database;
 
   return this;
 };
 
 var funcAndListenOn = function(port) {
-  mongoclickkerConnection.web = port;
+  mongoclikkerConnection.web = port;
   
   funcStartMongoclikker();
+};
+
+var funcProtectWithUser = function(user, pass) {
+  if (!pass || pass == '') {
+    throw new Error("Missing password! Mongoclikker has to be started with user and password to avoid external abuse");
+  } 
+  
+  mongoclikkerConnection.auth.user = user;
+  mongoclikkerConnection.auth.pass = pass;
+  
+  return this;
 };
 
 function endResponse(res) {
@@ -53,12 +68,17 @@ function endResponse(res) {
 
 var funcStartMongoclikker = function() {
   var app = require('express').createServer()
+    , express = require('express')
     , Db = require('mongodb').Db
     , Connection = require('mongodb').Connection
     , Server = require('mongodb').Server
     , BSON = require('mongodb').BSONNative
     , connectionSettings = {native_parser:true}
-    , viewURL = '/view/';
+    , viewURL = '/view/'
+    , ConnectAuth = require(__dirname + '/lib/semu-connect-basic-auth-c32ee11/lib/basicAuth');
+  
+  app.use(ConnectAuth(function (user, password) { return user === mongoclikkerConnection.auth.user && password == mongoclikkerConnection.auth.pass; })); 
+  app.use(express.bodyParser());  
   
   if (BSON == null) {
     /**
@@ -68,9 +88,9 @@ var funcStartMongoclikker = function() {
     connectionSettings = {};
   }
   
-  var currentDatabase = mongoclickkerConnection.db
-    , currentHostname = mongoclickkerConnection.host
-    , currentPort     = mongoclickkerConnection.port;
+  var currentDatabase = mongoclikkerConnection.db
+    , currentHostname = mongoclikkerConnection.host
+    , currentPort     = mongoclikkerConnection.port;
   
   /**
    * Serve style.css file
@@ -99,6 +119,51 @@ var funcStartMongoclikker = function() {
    * */
   app.get('/', function(req, res) {
     res.redirect(viewURL);
+  });
+  
+  /**
+   * Handle ajax update calls
+   * */
+
+  app.post('/update/*', function(req, res) {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    var newData = req.body.data;
+    var tmpProp = req.url.replace('/update/', '').split('__');
+    
+    var objectFind = {'_id': tmpProp[2]};
+    if (tmpProp[3].length == 12 || tmpProp[2].length == 24) { 
+      objectFind = {'_id': new  BSON.ObjectID(tmpProp[2])}; }
+    
+    db = new Db(tmpProp[0], new Server(currentHostname, currentPort, {}), connectionSettings)
+    db.open(function(err, ignored) {
+      if (err) { throw new Error(err); }
+      db.collection(tmpProp[1], function(err, collection) {
+        var updateKey = tmpProp[3];
+        var updateSet = {};
+        updateSet[updateKey] = newData;
+        
+        if (tmpProp[4] && tmpProp[5]) {
+          /**
+           * Update sub document 
+           * */
+          var subKey = tmpProp[3] + '._id';
+          objectFind[subKey] = tmpProp[4];
+          if (tmpProp[4].length == 12 || tmpProp[4].length == 24) { 
+            objectFind[subKey] = new BSON.ObjectID(tmpProp[4]); }
+          var updateSubKey = tmpProp[3] + '.$.' + tmpProp[5];
+          var updateSet = {};
+          updateSet[updateSubKey] = newData;
+        }
+        
+        collection.update(objectFind, {$set: updateSet}, {safe:true},
+          function(err) {
+            if (err) console.warn(err.message);
+          }
+        );
+      });      
+    });
+
+    res.end();
   });
   
   /**
@@ -210,7 +275,7 @@ var funcStartMongoclikker = function() {
                               if (req.params.subID && current0NSItem._id == req.params.subID) {
                                 res.write('<table>');
                                 for (var key in current0NSItem) {
-                                  res.write('<tr><td class="desc key">' + key + '</td><td class="content value subValue canEdit"  id="' + req.params.curDocument + '_' + n + '_' + current0NSItem._id + '_' + key + '">');
+                                  res.write('<tr><td class="desc key">' + key + '</td><td class="content value subValue canEdit"  id="' + dbName + '__' + req.params.curCollection + '__' + req.params.curDocument + '__' + n + '__' + current0NSItem._id + '__' + key + '">');
                                   res.write(current0NSItem[key] + '</td></tr>');
                                 }
                                 res.write('</table>');
@@ -223,7 +288,7 @@ var funcStartMongoclikker = function() {
                           /**
                            * Display simple document property
                            * */
-                          res.write('<tr><td class="desc key">' + n + '</td><td class="content value propValue canEdit" id="' + req.params.curDocument + '_' + n + '">' + results[0][n] + '</td></tr>'); 
+                          res.write('<tr><td class="desc key">' + n + '</td><td class="content value propValue canEdit" id="' + dbName + '__' + req.params.curCollection + '__' + req.params.curDocument + '__' + n + '">' + results[0][n] + '</td></tr>'); 
                         }
                       }
                       res.write('</table>');
@@ -238,11 +303,12 @@ var funcStartMongoclikker = function() {
       });
     }
   });
-  app.listen(mongoclickkerConnection.web);
-  console.log('Listening on http://localhost:' + mongoclickkerConnection.web + ':' + viewURL);
+  app.listen(mongoclikkerConnection.web);
+  console.log('Listening on http://localhost:' + mongoclikkerConnection.web + ':' + viewURL);
 };
 
 exports.setHost = funcSetHost;
+exports.protectWith = funcProtectWithUser;
 exports.andPort = funcAndPort;
 exports.withUser = funcWithUser;
 exports.andPassword = funcAndPassword;
