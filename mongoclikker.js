@@ -334,7 +334,7 @@ var funcStartMongoclikker = function() {
                       path += req.params.curDocument + '/';
                       for (var n in results[0]) { 
                         /**
-                         * Display simple document property
+                         * Display document properties
                          * */
                         var curValue = results[0][n];
                         var curType = typeOf(curValue);
@@ -363,7 +363,7 @@ var funcStartMongoclikker = function() {
     }
   });
   app.listen(mongoclikkerConnection.web);
-  console.log('Listening on http://localhost:' + mongoclikkerConnection.web + ':' + viewURL);
+  console.log('Listening on port ' + mongoclikkerConnection.web);
 };
 
 exports.setHost = funcSetHost;
