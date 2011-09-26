@@ -333,53 +333,22 @@ var funcStartMongoclikker = function() {
                     collection.find(params).toArray(function(err, results) {
                       path += req.params.curDocument + '/';
                       for (var n in results[0]) { 
-                        if (true == false && results[0][n] instanceof Array) {
-                          /**
-                           * Document has sub documents
-                           * 
-                          res.write('<tr><td class="desc key">' + n + '</td><td class="content value"><ul>');
-                          for (var s in results[0][n]) {
-                            var current0NSItem = results[0][n][s];
-                            if (current0NSItem._id) {
-                              if (current0NSItem.name) {
-                                res.write('<li><a href="' + path + req.params.curDocument + '/' + n + '/' + current0NSItem._id + '">');
-                                res.write(current0NSItem.name + ' (#' + current0NSItem._id + ')</a>'); }
-                              else if (current0NSItem._id) {
-                                res.write('<li><a href="' + path + req.params.curDocument + '/' + n + '/' + current0NSItem._id + '">');
-                                res.write(current0NSItem._id + '</a>'); 
-                              }
-                             
-                              if (req.params.subID && current0NSItem._id == req.params.subID) {
-                                res.write('<table>');
-                                for (var key in current0NSItem) {
-                                  res.write('<tr><td class="desc key">' + key + '</td><td class="content value subValue canEdit"  id="' + dbName + '__' + req.params.curCollection + '__' + req.params.curDocument + '__' + n + '__' + current0NSItem._id + '__' + key + '">');
-                                  res.write(current0NSItem[key] + '</td></tr>');
-                                }
-                                res.write('</table>');
-                              }
-                              res.write('</li>');
-                            }
-                          }
-                          res.write('</ul></td></tr>'); */
-                        } else {
-                          /**
-                           * Display simple document property
-                           * */
-                          var curValue = results[0][n];
-                          var curType = typeOf(curValue);
-                          var curID   = dbName + '__' + req.params.curCollection + '__' + req.params.curDocument + '__' + n + '__' + curType;
-                          var curCanEdit = canEditValue(curValue);
-                          var curKey = n;
-                          
-                          if (curType == 'array') {
-                            var curLength = curValue.length;
-                            curKey        = curKey + ' [' + curLength + ']';
-                          }
-                          
-                          curValue = displayValue(curValue, path + n + '/', 0, req.params);
-
-                          res.write('<tr><td class="desc key">' + curKey + '</td><td class="content value propValue ' + (curCanEdit ? 'canEdit' : '') + '" id="' + curID + '">' + curValue + '</td></tr>'); 
+                        /**
+                         * Display simple document property
+                         * */
+                        var curValue = results[0][n];
+                        var curType = typeOf(curValue);
+                        var curID   = dbName + '__' + req.params.curCollection + '__' + req.params.curDocument + '__' + n + '__' + curType;
+                        var curCanEdit = canEditValue(curValue);
+                        var curKey = n;
+                        
+                        if (curType == 'array') {
+                          var curLength = curValue.length;
+                          curKey        = curKey + ' [' + curLength + ']';
                         }
+                        
+                        curValue = displayValue(curValue, path + n + '/', 0, req.params);
+                        res.write('<tr><td class="desc key">' + curKey + '</td><td class="content value propValue ' + (curCanEdit ? 'canEdit' : '') + '" id="' + curID + '">' + curValue + '</td></tr>'); 
                       }
                       res.write('</table>');
                       endResponse(res); 
