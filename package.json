@@ -9,7 +9,7 @@
     "database",
     "mongo"
   ],
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "Sebastian Müller <code@semu.mp> (http://semu.mp)",
   "homepage": "https://github.com/semu/mongoclikker",
   "repository": {

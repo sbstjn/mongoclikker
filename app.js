@@ -1,7 +1,5 @@
-var mongoclikker = require('./mongoclikker.js');
-
-mongoclikker/*.setHost('localhost')
+require('./mongoclikker.js')/*.setHost('localhost')
             .andPort(27017)
             .forDatabase('mongoclikker') */
-            .protectWith('mongo', '') /* Set password for HTTP Access Authorization! Not MongoDB password! */
-            .andListenOn(2002);
+            .protectWith('mongo', 'clikker') /* Password for HTTP Authorization! */
+            .listenOn(2002);

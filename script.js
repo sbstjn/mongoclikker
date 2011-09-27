@@ -14,7 +14,7 @@ function hasClicked(newThis) {
     $(curThis).html(newValue);
     $(curThis).removeClass('isActive');
     
-    $.post("http://hazelno.de:2002/update/" + $(curThis).attr('id'), { data: newValue},
+    $.post("/update/" + $(curThis).attr('id'), { data: newValue},
       function(data) {
         
       }
