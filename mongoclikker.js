@@ -103,9 +103,9 @@ var displayValue = function(data, path, index, params) {
   
   if (curType == 'array') {
     var curLength = curValue.length;
-    curDisplay = '<table>';
+    curDisplay = '<table class="array">';
     for (var i = 0; i < curLength; i++) {
-      curDisplay += '<tr><td class="desc key">#' + i + '</td><td class="content value subValue"  id="">' + displayValue(data[i], path, i, params) + '</td></tr>';
+      curDisplay += '<tr><td class="desc key">' + (typeOf(data[i]) == 'array' ? '+' : '-') + ' </td><td class="content value subValue"  id="">' + displayValue(data[i], path, i, params) + '</td></tr>';
     }
     curDisplay += '</table>';
   } else if (curType == 'date') {
@@ -129,9 +129,10 @@ var displayValue = function(data, path, index, params) {
       if (!hasHeadline || hasHeadline && params.subID && params.subID == curValue._id) {
         styleString = ''; }
       
-      curDisplay += '<table style="' + styleString + '">';
+      curDisplay += '<table style="' + styleString + '" class="array">';
+      var count = 0;
       for (var key in curValue) {
-        curDisplay += '<tr><td class="desc key">' + key + ':</td><td class="content value subValue"  id="">' + curValue[key] + '</td></tr>';
+        curDisplay += '<tr><td class="desc key">' + key + ':</td><td class="content value subValue"  id="">' + (curValue[key]) + '</td></tr>';
       }
       curDisplay += '</table>';
     }
@@ -172,7 +173,7 @@ var funcStartMongoclikker = function() {
    * Serve style.css file
    * */
   app.get('/style.css', function(req, res) {
-    res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); table { -webkit-border-horizontal-spacing: 0px; -webkit-border-vertical-spacing: 0px; border-spacing: 0px; } .canEdit { cursor: pointer; } td { padding-top: 0px } .canEdit input { font-family: 'Varela Round', sans-serif; font-size: 14px; font-weight: normal; padding: 0 0 0 2px; margin: 0px; border: 0px; background-color: #CCC; } body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } a { text-decoration: none; color: #bf1010; } a:hover { text-decoration: underline; } .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } .content { font-size: 14px; font-weight: normal; padding-left: 25px; } .content ul { list-style-type: none; margin: 0; padding: 0; } .content ul li { margin: 0; padding: 0; } .docsNav { font-size: 14px; font-weight: normal; } .docsNav td { padding-top: 15px; padding-bottom: 25px; } .key { color: #999; } tr:hover .key { color: #36393D; }");
+res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); table { -webkit-border-horizontal-spacing: 0px; -webkit-border-vertical-spacing: 0px; border-spacing: 0px; } .canEdit { cursor: pointer; } td { padding-top: 0px } .canEdit input { font-family: 'Varela Round', sans-serif; font-size: 14px; font-weight: normal; padding: 0 0 0 2px; margin: 0px; border: 0px; background-color: #CCC; } body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } a { text-decoration: none; color: #bf1010; } a:hover { text-decoration: underline; } .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } .content { font-size: 14px; font-weight: normal; } .content ul { list-style-type: none; margin: 0; padding: 0; } .content ul li { margin: 0; padding: 0; } .docsNav { font-size: 14px; font-weight: normal; } .docsNav td { padding-top: 15px; padding-bottom: 25px; } .key { color: #999; padding-right: 25px; } tr:hover .key { color: #36393D; } table.array td.key { padding-right: 2px; } .desc { padding-right: 25px; }");  
   });
   
   /**
