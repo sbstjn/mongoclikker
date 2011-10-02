@@ -1,6 +1,6 @@
 # mongoclikker
 
-A clean [MongoDB](http://mongodb.org) viewer and basic editor written in [Node](http://nodejs.org). Just clone or download mongoclikker, run `npm install` and fire up [mongoclikker](https://github.com/semu/mongoclikker) with 
+A clean [MongoDB](http://mongodb.org) viewer and data editor written in [Node](http://nodejs.org). Just clone or download mongoclikker, run `npm install` and fire up [mongoclikker](https://github.com/semu/mongoclikker) with 
 
     [sudo] node app.js
 
