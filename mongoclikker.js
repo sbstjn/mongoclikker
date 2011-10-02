@@ -50,7 +50,7 @@ var funcWithUser = function(user) {
  * @return object mongoclikker
  * */
 var funcAndPassword = function(password) {
-  mongoclikkerConnection.pass = password
+  mongoclikkerConnection.pass = password;
   return this;
 };
 
@@ -82,7 +82,7 @@ var funcAndListenOn = function(port) {
  * @return object mongoclikker
  * */
 var funcProtectWithUser = function(user, pass) {
-  if (!pass || pass == '') {
+  if (!pass || pass === '') {
     throw new Error("Missing password! Mongoclikker has to be started with user and password to avoid external abuse");
   } 
   
@@ -109,15 +109,15 @@ function endResponse(res) {
 function castData(data) {
   var tmpInt = data*1;
   
-  if (data == '') {
+  if (data === '') {
     return ''; }
-  if (data == 'null') {
+  if (data === 'null') {
     return null; }
-  if (tmpInt == data) {
+  if (tmpInt === data) {
     return tmpInt; }
-  if (data == 'false') {
+  if (data === 'false') {
     return false; }
-  if (data == 'true') {
+  if (data === 'true') {
     return true; }
   return data;
 }
@@ -192,7 +192,7 @@ var displayValue = function(data, path, index, params) {
       hasHeadline = '<a href="">' + curValue.name + '</a><br />';
     }
 
-    var curDisplay = hasHeadline || '';
+    curDisplay = hasHeadline || '';
     var objString = curValue.toString();
     if (isID(objString)) {
       curDisplay += '<a href="">' + objString + '</a>';
@@ -286,7 +286,7 @@ res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); 
     if (tmpProp[3].length == 12 || tmpProp[2].length == 24) { 
       objectFind = {'_id': new  BSON.ObjectID(tmpProp[2])}; }
     
-    db = new Db(tmpProp[0], new Server(currentHostname, currentPort, {}), connectionSettings)
+    db = new Db(tmpProp[0], new Server(currentHostname, currentPort, {}), connectionSettings);
     db.open(function(err, ignored) {
       if (err) { throw new Error(err); }
       db.collection(tmpProp[1], function(err, collection) {
