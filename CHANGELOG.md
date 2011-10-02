@@ -1,5 +1,6 @@
 ## 0.2.2 (current beta)
 
+* new tests: data casting
 * new feature: sub document display
 * enhancement: array display
 * new feature: inline edit for basic properties (tested with Google Chrome)
