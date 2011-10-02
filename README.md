@@ -4,7 +4,7 @@ A clean [MongoDB](http://mongodb.org) viewer and basic editor written in [Node](
 
     [sudo] node app.js
 
-Open [http://HOSTNAME:2002/view/DATABASE](http://HOSTNAME:2002/view/DATABASE) in your web browser and your good to go…
+Open [http://HOSTNAME:2002/view/DATABASE](http://HOSTNAME:2002/view/DATABASE) in your web browser and you are good to go…
 
 ![mongoclikker](http://img.hazelco.de/mongoclikker222.png)
 
@@ -16,7 +16,7 @@ Per default mongoclikker is protected with a basic HTTP authentication, you shou
 
 ## Edit Mode
 
-[mongoclikker](https://github.com/semu/mongoclikker) supports simple inline edit for basic document properties. Editing of sub documents, arrays or objects is not supported at the moment.
+[mongoclikker](https://github.com/semu/mongoclikker) supports simple inline edit for basic document properties. 
 
 ## Configure
 
@@ -30,4 +30,4 @@ See `app.js` for setting a default database and mongodb connection. Default sett
     
 ## Database Design
 
-[mongoclikker](https://github.com/semu/mongoclikker) works best with documents having an ObjectID `_id` and a `name` property, included documents in arrays should be designed the same way. Of course [mongoclikker](https://github.com/semu/mongoclikker) works fine for collections and databases with different designs as well!
+[mongoclikker](https://github.com/semu/mongoclikker) works best with documents having an `_id` and a `name` property, included sub documents in arrays or properties should be designed the same way. Of course [mongoclikker](https://github.com/semu/mongoclikker) works fine for collections and databases with different designs!
