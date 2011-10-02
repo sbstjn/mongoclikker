@@ -66,23 +66,32 @@ function endResponse(res) {
   res.end();
 }
 
+function castData(data, type) {
+  var tmpInt = data*1;
+  
+  if (data == '') {
+    return ''; }
+  if (data == 'null') {
+    return null; }
+  if (tmpInt == data) {
+    return tmpInt; }
+  if (data == 'false') {
+    return false; }
+  if (data == 'true') {
+    return true; }
+  return data;
+}
+
 function typeOf(o){
   var type = typeof o;
-         //If typeof return something different than object then returns it.
 	if (type !== 'object') {
 		return type;
-         //If it is an instance of the Array then return "array"
 	} else if (Object.prototype.toString.call(o) === '[object Array]') {
 		return 'array';
-         //If it is null then return "null"
 	} else if (o === null) {
 		return 'null';
-       //if it gets here then it is an "object"
 	} else {
-    if (o instanceof Date) {
-      return 'date';
-    }
-    
+    if (o instanceof Date) { return 'date'; }
 		return 'object';
 	}
 }
@@ -217,12 +226,18 @@ res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); 
       db.collection(tmpProp[1], function(err, collection) {
         var updateKey = tmpProp[3];
         var updateSet = {};
-        updateSet[updateKey] = newData;
+        var dataType  = tmpProp.pop();
+        
+        updateSet[updateKey] = castData(newData, dataType);
+        
+        res.write(updateSet[updateKey] + "");
+        res.end();
         
         if (tmpProp[4] && tmpProp[5]) {
           /**
            * Update sub document 
            * */
+          /*
           var subKey = tmpProp[3] + '._id';
           objectFind[subKey] = tmpProp[4];
           if (tmpProp[4].length == 12 || tmpProp[4].length == 24) { 
@@ -230,7 +245,8 @@ res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); 
           var updateSubKey = tmpProp[3] + '.$.' + tmpProp[5];
           var updateSet = {};
           updateSet[updateSubKey] = newData;
-        }
+          */
+        } 
         
         collection.update(objectFind, {$set: updateSet}, {safe:true},
           function(err) {
@@ -239,8 +255,6 @@ res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); 
         );
       });      
     });
-
-    res.end();
   });
   
   /**
