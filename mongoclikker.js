@@ -14,42 +14,73 @@ var mongoclikkerConnection = {
   }
 };
 
+/**
+ * Set hostname for connection
+ * @param string host hostname
+ * @return object mongoclikker
+ * */
 var funcSetHost = function(host) {
   mongoclikkerConnection.host = host;
-
   return this;
 };
 
+/**
+ * Set port for connection
+ * @param integer port port
+ * @return object mongoclikker
+ * */
 var funcAndPort = function(port) {
   mongoclikkerConnection.port = port;
-
   return this;
 };
 
+/**
+ * Set username for connection
+ * @param string user username
+ * @return object mongoclikker
+ * */
 var funcWithUser = function(user) {
   mongoclikkerConnection.user = user;
-  
   return this;
 };
 
+/**
+ * Set password for connection
+ * @param string password password
+ * @return object mongoclikker
+ * */
 var funcAndPassword = function(password) {
   mongoclikkerConnection.pass = password
-  
   return this;
 };
 
+/**
+ * Set database name for connection
+ * @param string database database name
+ * @return object mongoclikker
+ * */
 var funcforDatabase = function(database) {
   mongoclikkerConnection.db = database;
-
   return this;
 };
 
+/**
+ * Set port for web interface
+ * @param integer port web interface listens on (Default: 2002)
+ * @return object mongoclikker
+ * */
 var funcAndListenOn = function(port) {
   mongoclikkerConnection.web = port;
   
   funcStartMongoclikker();
 };
 
+/**
+ * Protect mongoclikker with HTTP Authentication. 
+ * @param string user username
+ * @param string pass password
+ * @return object mongoclikker
+ * */
 var funcProtectWithUser = function(user, pass) {
   if (!pass || pass == '') {
     throw new Error("Missing password! Mongoclikker has to be started with user and password to avoid external abuse");
@@ -61,12 +92,21 @@ var funcProtectWithUser = function(user, pass) {
   return this;
 };
 
+/**
+ * End mongoclikker interface response
+ * @param object res response object
+ * */
 function endResponse(res) {
   res.write('</html>');
   res.end();
 }
 
-function castData(data, type) {
+/**
+ * Try to cast data received from update call
+ * @param string data input
+ * @return mixed casted output
+ * */
+function castData(data) {
   var tmpInt = data*1;
   
   if (data == '') {
@@ -82,29 +122,52 @@ function castData(data, type) {
   return data;
 }
 
-function typeOf(o){
-  var type = typeof o;
+/**
+ * Get type of given data
+ * @param mixed data input
+ * @return string type
+ * */
+function typeOf(data){
+  var type = typeof data;
 	if (type !== 'object') {
 		return type;
-	} else if (Object.prototype.toString.call(o) === '[object Array]') {
+	} else if (Object.prototype.toString.call(data) === '[object Array]') {
 		return 'array';
-	} else if (o === null) {
+	} else if (data === null) {
 		return 'null';
 	} else {
-    if (o instanceof Date) { return 'date'; }
+    if (data instanceof Date) { return 'date'; }
 		return 'object';
 	}
 }
 
+/**
+ * Check if given string has mongodb object id format 
+ * @param string data input
+ * @return boolean
+ * */
 function isID(data) {
   return (data.length == 12 || data.length == 24);
 }
 
+/**
+ * Check if edit is supported for given data 
+ * @param mixed value data to be displayed
+ * @return boolean is editible?
+ * */
 function canEditValue(value) {
   var curType = typeOf(value);
   return !(curType == 'array' || curType == 'object');
 }
 
+/**
+ * Display property value in interface 
+ * @param mixed data data to be displayed
+ * @param string path absolute path for url
+ * @param integer index for array values
+ * @param object params HTTP params from request
+ * @return string styled value ready for output
+ * */
 var displayValue = function(data, path, index, params) {
   var curType     = typeOf(data);
   var curValue    = data;
@@ -152,6 +215,9 @@ var displayValue = function(data, path, index, params) {
   return curDisplay;
 };
 
+/**
+ * Start mongoclikker
+ * */
 var funcStartMongoclikker = function() {
   var app = require('express').createServer()
     , express = require('express')
@@ -388,3 +454,4 @@ exports.withUser = funcWithUser;
 exports.andPassword = funcAndPassword;
 exports.forDatabase = funcforDatabase;
 exports.andListenOn = exports.listenOn = funcAndListenOn;
+exports.cast = castData;
