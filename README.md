@@ -1,12 +1,12 @@
 # mongoclikker
 
-A clean [MongoDB](http://mongodb.org) viewer and data editor written in [Node](http://nodejs.org). Just clone or download mongoclikker, run `npm install` and fire up [mongoclikker](https://github.com/semu/mongoclikker) with 
+A clean [MongoDB](http://mongodb.org) viewer and basic editor written in [Node](http://nodejs.org). Just clone or download mongoclikker, run `npm install` and fire up [mongoclikker](https://github.com/semu/mongoclikker) with 
 
     [sudo] node app.js
 
 Open [http://HOSTNAME:2002/view/DATABASE](http://HOSTNAME:2002/view/DATABASE) in your web browser and you are good to go…
 
-![mongoclikker](http://img.hazelco.de/mongoclikker222.png)
+![mongoclikker](http://img.hazelco.de/mongoclikker.jpg)
 
 ## Security
 

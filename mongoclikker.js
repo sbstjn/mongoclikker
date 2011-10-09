@@ -50,7 +50,7 @@ var funcWithUser = function(user) {
  * @return object mongoclikker
  * */
 var funcAndPassword = function(password) {
-  mongoclikkerConnection.pass = password;
+  mongoclikkerConnection.pass = password
   return this;
 };
 
@@ -82,7 +82,7 @@ var funcAndListenOn = function(port) {
  * @return object mongoclikker
  * */
 var funcProtectWithUser = function(user, pass) {
-  if (!pass || pass === '') {
+  if (!pass || pass == '') {
     throw new Error("Missing password! Mongoclikker has to be started with user and password to avoid external abuse");
   } 
   
@@ -109,15 +109,15 @@ function endResponse(res) {
 function castData(data) {
   var tmpInt = data*1;
   
-  if (data === '') {
+  if (data == '') {
     return ''; }
-  if (data === 'null') {
+  if (data == 'null') {
     return null; }
-  if (tmpInt === data) {
+  if (tmpInt == data) {
     return tmpInt; }
-  if (data === 'false') {
+  if (data == 'false') {
     return false; }
-  if (data === 'true') {
+  if (data == 'true') {
     return true; }
   return data;
 }
@@ -177,7 +177,7 @@ var displayValue = function(data, path, index, params) {
     var curLength = curValue.length;
     curDisplay = '<table class="array">';
     for (var i = 0; i < curLength; i++) {
-      curDisplay += '<tr><td class="desc key">' + (typeOf(data[i]) == 'array' ? '+' : '-') + ' </td><td class="content value subValue"  id="">' + displayValue(data[i], path, i, params) + '</td></tr>';
+      curDisplay += '<tr><td class="desc key noRightMargin">' + (typeOf(data[i]) == 'array' ? '+' : '-') + ' </td><td class="content value subValue"  id="">' + displayValue(data[i], path, i, params) + '</td></tr>';
     }
     curDisplay += '</table>';
   } else if (curType == 'date') {
@@ -192,7 +192,7 @@ var displayValue = function(data, path, index, params) {
       hasHeadline = '<a href="">' + curValue.name + '</a><br />';
     }
 
-    curDisplay = hasHeadline || '';
+    var curDisplay = hasHeadline || '';
     var objString = curValue.toString();
     if (isID(objString)) {
       curDisplay += '<a href="">' + objString + '</a>';
@@ -231,6 +231,7 @@ var funcStartMongoclikker = function() {
   
   app.use(ConnectAuth(function (user, password) { return user === mongoclikkerConnection.auth.user && password == mongoclikkerConnection.auth.pass; })); 
   app.use(express.bodyParser());  
+  app.use(express.static(__dirname + '/static'));
   
   if (BSON == null) {
     /**
@@ -243,28 +244,6 @@ var funcStartMongoclikker = function() {
   var currentDatabase = mongoclikkerConnection.db
     , currentHostname = mongoclikkerConnection.host
     , currentPort     = mongoclikkerConnection.port;
-  
-  /**
-   * Serve style.css file
-   * */
-  app.get('/style.css', function(req, res) {
-res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); table { -webkit-border-horizontal-spacing: 0px; -webkit-border-vertical-spacing: 0px; border-spacing: 0px; } .canEdit { cursor: pointer; } td { padding-top: 0px } .canEdit input { font-family: 'Varela Round', sans-serif; font-size: 14px; font-weight: normal; padding: 0 0 0 2px; margin: 0px; border: 0px; background-color: #CCC; } body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } a { text-decoration: none; color: #bf1010; } a:hover { text-decoration: underline; } .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } .content { font-size: 14px; font-weight: normal; } .content ul { list-style-type: none; margin: 0; padding: 0; } .content ul li { margin: 0; padding: 0; } .docsNav { font-size: 14px; font-weight: normal; } .docsNav td { padding-top: 15px; padding-bottom: 25px; } .key { color: #999; padding-right: 25px; } tr:hover .key { color: #36393D; } table.array td.key { padding-right: 2px; } .desc { padding-right: 25px; }");  
-  });
-  
-  /**
-   * Load script.js from external file
-   * */
-  app.get('/script.js', function(req, res) {
-    var fs = require('fs');
-    fs.readFile(__dirname + '/script.js', function(error, content) {
-      if (error) {
-        res.writeHead(500);
-        res.end(); }
-      else {
-        res.writeHead(200, { 'Content-Type': 'text/javascript' });
-        res.end(content, 'utf-8'); }
-    });
-  });
   
   /**
    * Redirect / to viewURL
@@ -286,7 +265,7 @@ res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); 
     if (tmpProp[3].length == 12 || tmpProp[2].length == 24) { 
       objectFind = {'_id': new  BSON.ObjectID(tmpProp[2])}; }
     
-    db = new Db(tmpProp[0], new Server(currentHostname, currentPort, {}), connectionSettings);
+    db = new Db(tmpProp[0], new Server(currentHostname, currentPort, {}), connectionSettings)
     db.open(function(err, ignored) {
       if (err) { throw new Error(err); }
       db.collection(tmpProp[1], function(err, collection) {
@@ -327,7 +306,7 @@ res.end("@import url('http://fonts.googleapis.com/css?family=Varela+Round&v2'); 
    * Handle database access
    * */
   app.get(viewURL + ':curDB?/:curCollection?/:curStart?/:curLimit?/:curDocument?/:curKey?/:subID?', function(req, res, next) {
-    res.write('<html><head><title>mongoclikker</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script><script src="/script.js"></script><link rel="stylesheet" href="/style.css"></head>');
+    res.write('<html><head><title>mongoclikker</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script><script src="/script.js"></script><style>@import url("http://fonts.googleapis.com/css?family=Varela+Round&v2");</style><link rel="stylesheet/less" type="text/css" href="/styles.less"><script src="/less.js" type="text/javascript"></script></head>');
   
     /**
      * don't know how to get `show dbs` with node yet, so start with one datebase

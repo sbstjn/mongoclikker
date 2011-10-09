@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "mongodb": ">= 0.9.6-7",
-    "express": ">= 2.2.2"
+    "express": ">= 2.2.2",
+    "assert": ">= 0.4.9"
   },
   "licenses": [
     {

@@ -1,5 +1,7 @@
 ## 0.2.2 (current beta)
 
+* new feature: included lesscss.org framework
+* enhancement: moved static files in seperate folder
 * new tests: data casting
 * new feature: sub document display
 * enhancement: array display
