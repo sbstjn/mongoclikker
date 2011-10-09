@@ -1,18 +1,15 @@
 function triggerCancelEvent(curThis, value) { 
   $(curThis).html(value);
   $(curThis).removeClass('isActive');
-  
   $(curThis).click(function(e2) { hasClicked(this, e2); });
 }
 
 function triggerSaveEvent(curThis, newValue) {
+  $(curThis).html($(curThis).find('input')).append($('<img src="/load.gif" class="loader" />'));
   $.post("/update/" + $(curThis).attr('id'), { data: newValue},
     function(data) {
       $(curThis).removeClass('isActive');
-      $(curThis).html(data);
-    }
-  );
-  
+      $(curThis).html(data); } );
   $(curThis).click(function(e2) { hasClicked(this, e2); });
 }
 
@@ -46,7 +43,7 @@ $(document).ready(function() {
   $('.canEdit').each(function() {
     $(this).click(function(e) {
       e.stopImmediatePropagation();
-      hasClicked(this, e);
+      hasClicked(this, e); 
     });
   });
 });

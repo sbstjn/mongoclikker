@@ -1,8 +1,10 @@
+@colorFont: #36393D;
+
 table { -webkit-border-horizontal-spacing: 0px; -webkit-border-vertical-spacing: 0px; border-spacing: 0px; } 
 .canEdit { cursor: pointer; } 
 td { padding-top: 0px } 
 .canEdit input { font-family: 'Varela Round', sans-serif; font-size: 14px; font-weight: normal; padding: 0 0 0 2px; margin: 0px; border: 0px; background-color: #CCC; } 
-body { background-color: #EEEEEE; color: #36393D; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } 
+body { background-color: #EEEEEE; color: @colorFont; font-family: 'Varela Round', sans-serif; font-size: 12px; font-weight: normal; margin: 30px; } 
 a { text-decoration: none; color: #bf1010; } 
 a:hover { text-decoration: underline; } 
 .desc { font-weight: bold; vertical-align: top; font-size: 14px; font-weight: normal; } 
@@ -10,8 +12,8 @@ a:hover { text-decoration: underline; }
 .content ul { list-style-type: none; margin: 0; padding: 0; } 
 .content ul li { margin: 0; padding: 0; } 
 .docsNav { font-size: 14px; font-weight: normal; } 
+.key, .desc { color: #999; padding-right: 25px; } 
 .docsNav td { padding-top: 15px; padding-bottom: 25px; } 
-.key { color: #999; padding-right: 25px; } 
-tr:hover .key { color: #36393D; } 
+tr:hover .key { color: @colorFont; } 
 table.array td.noRightMargin { padding-right: 2px; } 
-.desc { padding-right: 25px; }
+.loader { position: relative; top: 1px; left: 7px; }
