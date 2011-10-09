@@ -200,11 +200,19 @@ var displayValue = function(data, path, index, params) {
       var styleString = 'display:none;';
       if (!hasHeadline || hasHeadline && params.subID && params.subID == curValue._id) {
         styleString = ''; }
-      
+
+      var curID = '1';
+      var curCanEdit = canEditValue(curValue);
       curDisplay += '<table style="' + styleString + '" class="array">';
       var count = 0;
       for (var key in curValue) {
-        curDisplay += '<tr><td class="desc key">' + key + ':</td><td class="content value subValue"  id="">' + (curValue[key]) + '</td></tr>';
+        var curKey = key;
+        var curType = typeOf(curValue[key]);
+        if (curType == 'array') {
+          var curLength = curValue[key].length;
+          curKey        = curKey + ' [' + curLength + ']';
+        }
+        curDisplay += '<tr><td class="desc key">' + curKey + ':</td><td class="content value propValue ' + (curCanEdit ? 'canEdit' : '') + '" id="' + curID + '">' + displayValue(curValue[key], path, index, params) + '</td></tr>';
       }
       curDisplay += '</table>';
     }
