@@ -136,7 +136,8 @@ function typeOf(data){
 	} else if (data === null) {
 		return 'null';
 	} else {
-    if (data instanceof Date) { return 'date'; }
+    if (data instanceof Date) { 
+      return 'date'; }
 		return 'object';
 	}
 }
@@ -168,7 +169,7 @@ function canEditValue(value) {
  * @param object params HTTP params from request
  * @return string styled value ready for output
  * */
-function displayValue(data, path, preID, index, params) {
+function displayValue(data, path, preID, index, params, parentEdit) {
   var curType     = typeOf(data);
   var curValue    = data;
   var curDisplay  = '';
@@ -177,7 +178,7 @@ function displayValue(data, path, preID, index, params) {
     var curLength = curValue.length;
     curDisplay = '<table class="array">';
     for (var i = 0; i < curLength; i++) {
-      curDisplay += '<tr><td class="desc key noRightMargin">' + (typeOf(data[i]) == 'array' ? '+' : '-') + ' </td><td class="content value subValue"  id="">' + displayValue(data[i], path, preID, i, params) + '</td></tr>';
+      curDisplay += '<tr><td class="desc key noRightMargin">' + (typeOf(data[i]) == 'array' ? '+' : '-') + ' </td><td class="content value subValue"  id="">' + displayValue(data[i], path, preID, i, params, false) + '</td></tr>';
     }
     curDisplay += '</table>';
   } else if (curType == 'date') {
@@ -203,7 +204,7 @@ function displayValue(data, path, preID, index, params) {
       
       curDisplay += '<table style="' + styleString + '" class="array">';
       for (var key in curValue) {
-        curDisplay += displayLine(key, curValue[key], path, preID, params);
+        curDisplay += displayLine(key, curValue[key], path, preID, params, parentEdit);
       }
       curDisplay += '</table>';
     }
@@ -223,17 +224,13 @@ function displayValue(data, path, preID, index, params) {
  * @param mixed params request parameters
  * @return string
  * */
-var displayLine = function(key, curValue, path, preID, params) {
-  var curType = typeOf(curValue);
+var displayLine = function(key, curValue, path, preID, params, parentEdit) {
   var curID   = preID + '__' + key;
-  var curPath = path + key + '/';
-  var editMode = (false && canEditValue(curValue) ? 'canEdit' : '');
-  var curKey = key;
+  var canEdit = parentEdit && canEditValue(curValue);
+  if (typeOf(curValue) == 'array') {
+    key += ' [' +  curValue.length + ']'; }
 
-  if (curType == 'array') {
-    curKey += ' [' +  curValue.length + ']'; }
-
-  return '<tr><td class="desc key">' + curKey + '</td><td class="content value propValue ' + editMode + '" id="' + curID + '">' + displayValue(curValue, curPath, curID, 0, params) + '</td></tr>';
+  return '<tr><td class="desc key">' + key + '</td><td class="content value propValue' + (canEdit ? ' canEdit' : '') + '" id="' + curID + '">' + displayValue(curValue, path + key + '/', curID, 0, params, canEdit) + '</td></tr>';
 }
 
 /**
@@ -413,7 +410,7 @@ var funcStartMongoclikker = function() {
                     collection.find(params).toArray(function(err, results) {
                       path += req.params.curDocument + '/';
                       for (var n in results[0]) { 
-                        res.write('' + displayLine(n, results[0][n], path, dbName + '__' + req.params.curCollection + '__' + req.params.curDocument, req.params));
+                        res.write('' + displayLine(n, results[0][n], path, dbName + '__' + req.params.curCollection + '__' + req.params.curDocument, req.params, true));
                       }
                       res.write('</table>');
                       endResponse(res); 
