@@ -168,7 +168,7 @@ function canEditValue(value) {
  * @param object params HTTP params from request
  * @return string styled value ready for output
  * */
-var displayValue = function(data, path, index, params) {
+function displayValue(data, path, preID, index, params) {
   var curType     = typeOf(data);
   var curValue    = data;
   var curDisplay  = '';
@@ -177,7 +177,7 @@ var displayValue = function(data, path, index, params) {
     var curLength = curValue.length;
     curDisplay = '<table class="array">';
     for (var i = 0; i < curLength; i++) {
-      curDisplay += '<tr><td class="desc key noRightMargin">' + (typeOf(data[i]) == 'array' ? '+' : '-') + ' </td><td class="content value subValue"  id="">' + displayValue(data[i], path, i, params) + '</td></tr>';
+      curDisplay += '<tr><td class="desc key noRightMargin">' + (typeOf(data[i]) == 'array' ? '+' : '-') + ' </td><td class="content value subValue"  id="">' + displayValue(data[i], path, preID, i, params) + '</td></tr>';
     }
     curDisplay += '</table>';
   } else if (curType == 'date') {
@@ -198,21 +198,12 @@ var displayValue = function(data, path, index, params) {
       curDisplay += '<a href="">' + objString + '</a>';
     } else {
       var styleString = 'display:none;';
-      if (!hasHeadline || hasHeadline && params.subID && params.subID == curValue._id) {
+      if (params && !hasHeadline || hasHeadline && params.subID && params.subID == curValue._id) {
         styleString = ''; }
-
-      var curID = '1';
-      var curCanEdit = canEditValue(curValue);
+      
       curDisplay += '<table style="' + styleString + '" class="array">';
-      var count = 0;
       for (var key in curValue) {
-        var curKey = key;
-        var curType = typeOf(curValue[key]);
-        if (curType == 'array') {
-          var curLength = curValue[key].length;
-          curKey        = curKey + ' [' + curLength + ']';
-        }
-        curDisplay += '<tr><td class="desc key">' + curKey + ':</td><td class="content value propValue ' + (curCanEdit ? 'canEdit' : '') + '" id="' + curID + '">' + displayValue(curValue[key], path, index, params) + '</td></tr>';
+        curDisplay += displayLine(key, curValue[key], path, preID, params);
       }
       curDisplay += '</table>';
     }
@@ -222,6 +213,28 @@ var displayValue = function(data, path, index, params) {
   
   return curDisplay;
 };
+
+/**
+ * Display content line with key and value
+ * @param sting key item key
+ * @param mixed curValue item value
+ * @param string path current item path
+ * @param string preID current input id path
+ * @param mixed params request parameters
+ * @return string
+ * */
+var displayLine = function(key, curValue, path, preID, params) {
+  var curType = typeOf(curValue);
+  var curID   = preID + '__' + key;
+  var curPath = path + key + '/';
+  var editMode = (false && canEditValue(curValue) ? 'canEdit' : '');
+  var curKey = key;
+
+  if (curType == 'array') {
+    curKey += ' [' +  curValue.length + ']'; }
+
+  return '<tr><td class="desc key">' + curKey + '</td><td class="content value propValue ' + editMode + '" id="' + curID + '">' + displayValue(curValue, curPath, curID, 0, params) + '</td></tr>';
+}
 
 /**
  * Start mongoclikker
@@ -236,22 +249,22 @@ var funcStartMongoclikker = function() {
     , connectionSettings = {native_parser:true}
     , viewURL = '/view/'
     , ConnectAuth = require(__dirname + '/lib/semu-connect-basic-auth-c32ee11/lib/basicAuth');
-  
+    
+  var currentDatabase = mongoclikkerConnection.db
+    , currentHostname = mongoclikkerConnection.host
+    , currentPort     = mongoclikkerConnection.port;
+    
   app.use(ConnectAuth(function (user, password) { return user === mongoclikkerConnection.auth.user && password == mongoclikkerConnection.auth.pass; })); 
   app.use(express.bodyParser());  
   app.use(express.static(__dirname + '/static'));
   
+  /**
+   * Fallback for non-native BSON objects
+   * */
   if (BSON == null) {
-    /**
-     * Fallback for non-native BSON objects
-     * */
     BSON = require('mongodb').BSONPure;
     connectionSettings = {};
   }
-  
-  var currentDatabase = mongoclikkerConnection.db
-    , currentHostname = mongoclikkerConnection.host
-    , currentPort     = mongoclikkerConnection.port;
   
   /**
    * Redirect / to viewURL
@@ -263,7 +276,6 @@ var funcStartMongoclikker = function() {
   /**
    * Handle ajax update calls
    * */
-
   app.post('/update/*', function(req, res) {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     var newData = req.body.data;
@@ -401,22 +413,7 @@ var funcStartMongoclikker = function() {
                     collection.find(params).toArray(function(err, results) {
                       path += req.params.curDocument + '/';
                       for (var n in results[0]) { 
-                        /**
-                         * Display document properties
-                         * */
-                        var curValue = results[0][n];
-                        var curType = typeOf(curValue);
-                        var curID   = dbName + '__' + req.params.curCollection + '__' + req.params.curDocument + '__' + n + '__' + curType;
-                        var curCanEdit = canEditValue(curValue);
-                        var curKey = n;
-                        
-                        if (curType == 'array') {
-                          var curLength = curValue.length;
-                          curKey        = curKey + ' [' + curLength + ']';
-                        }
-                        
-                        curValue = displayValue(curValue, path + n + '/', 0, req.params);
-                        res.write('<tr><td class="desc key">' + curKey + '</td><td class="content value propValue ' + (curCanEdit ? 'canEdit' : '') + '" id="' + curID + '">' + curValue + '</td></tr>'); 
+                        res.write('' + displayLine(n, results[0][n], path, dbName + '__' + req.params.curCollection + '__' + req.params.curDocument, req.params));
                       }
                       res.write('</table>');
                       endResponse(res); 
